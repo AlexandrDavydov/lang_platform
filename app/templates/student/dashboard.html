@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Кабинет ученика{% endblock %}
+
+{% block content %}
+<h1>Кабинет ученика</h1>
+<p>Добро пожаловать, {{ current_user.first_name }} {{ current_user.last_name }}!</p>
+<p>Это заглушка дашборда ученика.</p>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Админ-панель{% endblock %}
+
+{% block content %}
+<h1>Панель администратора</h1>
+<p>Добро пожаловать, {{ current_user.first_name }} {{ current_user.last_name }}!</p>
+
+<a href="{{ url_for('admin.schedule') }}" class="btn">Расписание занятий</a>
+
+<h2>Пользователи</h2>
+<table border="1" cellpadding="8">
+    <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Имя</th>
+        <th>Фамилия</th>
+        <th>Роль</th>
+        <th>Email подтверждён</th>
+        <th>Действия</th>
+    </tr>
+    {% for user in users %}
+    <tr>
+        <td>{{ user.id }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.first_name }}</td>
+        <td>{{ user.last_name }}</td>
+        <td>{{ user.role }}</td>
+        <td>{{ 'Да' if user.email_confirmed else 'Нет' }}</td>
+        <td>
+            {% if not user.email_confirmed and user.role != 'admin' %}
+                <a href="{{ url_for('admin.confirm_user', user_id=user.id) }}">Подтвердить</a>
+            {% else %}
+                —
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

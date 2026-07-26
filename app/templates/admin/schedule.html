@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Расписание занятий{% endblock %}
+
+{% block content %}
+<h1>Расписание занятий</h1>
+
+<div class="calendar-nav">
+    <a href="{{ url_for('admin.schedule', year=cal_prev_year, month=cal_prev) }}">&larr; {{ cal_prev }}</a>
+    <span>{{ month_name }} {{ year }}</span>
+    <a href="{{ url_for('admin.schedule', year=cal_next_year, month=cal_next) }}">{{ cal_next }} &rarr;</a>
+</div>
+
+<table class="calendar">
+    <tr>
+        <th>Пн</th>
+        <th>Вт</th>
+        <th>Ср</th>
+        <th>Чт</th>
+        <th>Пт</th>
+        <th>Сб</th>
+        <th>Вс</th>
+    </tr>
+    {% for week in month_days %}
+    <tr>
+        {% for day in week %}
+        <td class="{% if day == 0 %}empty{% endif %}">
+            {% if day > 0 %}
+                {% set day_str = "%04d-%02d-%02d"|format(year, month, day) %}
+                <a href="{{ url_for('admin.schedule_day', lesson_date=day_str) }}"
+                   class="{% if day_str in lesson_dates %}has-lesson{% endif %}
+                          {% if year == today.year and month == today.month and day == today.day %}today{% endif %}">
+                    {{ day }}
+                </a>
+            {% endif %}
+        </td>
+        {% endfor %}
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{{ url_for('admin.dashboard') }}" class="btn">&larr; Назад в админ-панель</a>
+{% endblock %}

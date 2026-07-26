@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Занятия на {{ date }}{% endblock %}
+
+{% block content %}
+<h1>Занятия на {{ date.strftime('%d.%m.%Y') }}</h1>
+
+<h2>Существующие занятия</h2>
+{% if lessons %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Ученик</th>
+        <th>Название</th>
+        <th>Начало</th>
+        <th>Конец</th>
+        <th>Действия</th>
+    </tr>
+    {% for lesson in lessons %}
+    <tr>
+        <td>{{ lesson.student.first_name }} {{ lesson.student.last_name }}</td>
+        <td>{{ lesson.title }}</td>
+        <td>{{ lesson.start_time.strftime('%H:%M') }}</td>
+        <td>{{ lesson.end_time.strftime('%H:%M') }}</td>
+        <td>
+            <button onclick="editLesson({{ lesson.id }})">Редактировать</button>
+            <form method="POST" action="{{ url_for('admin.delete_lesson', lesson_date=date.isoformat(), lesson_id=lesson.id) }}" style="display:inline">
+                <button type="submit" onclick="return confirm('Удалить занятие?')">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>На этот день нет занятий.</p>
+{% endif %}
+
+<hr>
+
+<h2 id="form-title">Добавить занятие</h2>
+<form method="POST" action="{{ url_for('admin.schedule_day', lesson_date=date.isoformat()) }}">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.student.label }}<br>
+        {{ form.student() }}
+    </p>
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=64) }}
+    </p>
+    <p>
+        {{ form.date.label }}<br>
+        {{ form.date() }}
+    </p>
+    <p>
+        {{ form.start_time.label }}<br>
+        {{ form.start_time() }}
+    </p>
+    <p>
+        {{ form.end_time.label }}<br>
+        {{ form.end_time() }}
+    </p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+<a href="{{ url_for('admin.schedule', year=date.year, month=date.month) }}">&larr; Назад к календарю</a>
+
+<script>
+function editLesson(id) {
+    fetch('/admin/schedule/api/lesson/' + id)
+        .then(r => r.json())
+        .then(data => {
+            document.querySelector('#student').value = data.student_id;
+            document.querySelector('#title').value = data.title;
+            document.querySelector('#date').value = data.date;
+            document.querySelector('#start_time').value = data.start_time;
+            document.querySelector('#end_time').value = data.end_time;
+            document.querySelector('form').action = '/admin/schedule/{{ date.isoformat() }}/edit/' + id;
+            document.querySelector('#form-title').textContent = 'Редактировать занятие';
+        });
+}
+</script>
+{% endblock %}
