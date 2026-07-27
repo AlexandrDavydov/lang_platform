@@ -1,4 +1,8 @@
+from datetime import date, timedelta
 import pytest
+
+
+FUTURE = (date.today() + timedelta(days=30)).isoformat()
 
 
 def login(page, base_url, email, password):
@@ -15,7 +19,7 @@ def test_admin_creates_lesson_all_see_it(page, live_server):
     # 1. Admin creates a lesson
     login(page, base_url, 'admin@lang.ru', 'admin123')
     page.wait_for_url(f'{base_url}/admin/dashboard')
-    page.goto(f'{base_url}/admin/schedule/2026-07-26')
+    page.goto(f'{base_url}/admin/schedule/{FUTURE}')
     page.wait_for_selector('#student')
 
     page.select_option('#student', label='Student #1')
@@ -51,7 +55,7 @@ def test_teacher_creates_lesson_student_admin_see_it(page, live_server):
     # 1. Teacher creates a lesson
     login(page, base_url, 'teacher1@lang.ru', 'teacher123')
     page.wait_for_url(f'{base_url}/dashboard/teacher')
-    page.goto(f'{base_url}/dashboard/teacher/schedule/2026-07-27')
+    page.goto(f'{base_url}/dashboard/teacher/schedule/{FUTURE}')
     page.wait_for_selector('#student')
 
     page.select_option('#student', label='Student #2')
@@ -75,7 +79,7 @@ def test_teacher_creates_lesson_student_admin_see_it(page, live_server):
     page.goto(f'{base_url}/auth/logout')
     login(page, base_url, 'admin@lang.ru', 'admin123')
     page.wait_for_url(f'{base_url}/admin/dashboard')
-    page.goto(f'{base_url}/admin/schedule/2026-07-27')
+    page.goto(f'{base_url}/admin/schedule/{FUTURE}')
     page.wait_for_selector('table')
 
     assert page.locator('table tbody').filter(has_text='Teacher Created Lesson').is_visible()
