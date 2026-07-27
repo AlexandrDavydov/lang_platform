@@ -6,6 +6,8 @@
 <h1>Кабинет учителя</h1>
 <p>Добро пожаловать, {{ current_user.first_name }} {{ current_user.last_name }}!</p>
 
+<a href="{{ url_for('dashboard.teacher_schedule') }}" class="btn">Расписание занятий</a>
+
 <h2>Предстоящие занятия</h2>
 {% if upcoming %}
 <table border="1" cellpadding="8">

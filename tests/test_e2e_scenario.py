@@ -43,3 +43,39 @@ def test_admin_creates_lesson_all_see_it(page, live_server):
 
     page.wait_for_selector('table')
     assert page.locator('text=E2E Test Lesson').is_visible()
+
+
+def test_teacher_creates_lesson_student_admin_see_it(page, live_server):
+    base_url = live_server
+
+    # 1. Teacher creates a lesson
+    login(page, base_url, 'teacher1@lang.ru', 'teacher123')
+    page.wait_for_url(f'{base_url}/dashboard/teacher')
+    page.goto(f'{base_url}/dashboard/teacher/schedule/2026-07-27')
+    page.wait_for_selector('#student')
+
+    page.select_option('#student', label='Student #2')
+    page.fill('#title', 'Teacher Created Lesson')
+    page.fill('#start_time', '14:00')
+    page.fill('#end_time', '15:00')
+    page.click('input[type="submit"]')
+
+    page.wait_for_selector('table')
+    assert page.locator('table tbody').filter(has_text='Teacher Created Lesson').is_visible()
+
+    # 2. Student sees lesson on dashboard
+    page.goto(f'{base_url}/auth/logout')
+    login(page, base_url, 'student2@lang.ru', 'student123')
+    page.wait_for_url(f'{base_url}/dashboard/student')
+
+    page.wait_for_selector('table')
+    assert page.locator('text=Teacher Created Lesson').is_visible()
+
+    # 3. Admin sees lesson on schedule page
+    page.goto(f'{base_url}/auth/logout')
+    login(page, base_url, 'admin@lang.ru', 'admin123')
+    page.wait_for_url(f'{base_url}/admin/dashboard')
+    page.goto(f'{base_url}/admin/schedule/2026-07-27')
+    page.wait_for_selector('table')
+
+    assert page.locator('table tbody').filter(has_text='Teacher Created Lesson').is_visible()

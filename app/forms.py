@@ -39,3 +39,12 @@ class ScheduleLessonForm(FlaskForm):
     start_time = TimeField('Начало', format='%H:%M', validators=[DataRequired()])
     end_time = TimeField('Конец', format='%H:%M', validators=[DataRequired()])
     submit = SubmitField('Сохранить')
+
+
+class TeacherLessonForm(FlaskForm):
+    student = SelectField('Ученик', coerce=int, validators=[DataRequired()])
+    title = StringField('Название занятия', validators=[DataRequired()])
+    date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
+    start_time = TimeField('Начало', format='%H:%M', validators=[DataRequired()])
+    end_time = TimeField('Конец', format='%H:%M', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')
