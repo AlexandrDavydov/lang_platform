@@ -102,13 +102,16 @@ def schedule_day(lesson_date):
         return redirect(url_for('admin.schedule'))
 
     students = User.query.filter_by(role='student').all()
+    teachers = User.query.filter_by(role='teacher').all()
     form = ScheduleLessonForm()
     form.student.choices = [(s.id, f'{s.first_name} {s.last_name}') for s in students]
+    form.teacher.choices = [(t.id, f'{t.first_name} {t.last_name}') for t in teachers]
     form.date.data = dt
 
     if form.validate_on_submit():
         lesson = ScheduleLesson(
             student_id=form.student.data,
+            teacher_id=form.teacher.data,
             title=form.title.data,
             date=form.date.data,
             start_time=form.start_time.data,
@@ -120,7 +123,7 @@ def schedule_day(lesson_date):
         return redirect(url_for('admin.schedule_day', lesson_date=lesson_date))
 
     lessons = ScheduleLesson.query.filter_by(date=dt).order_by(ScheduleLesson.start_time).all()
-    return render_template('admin/schedule_day.html', date=dt, lessons=lessons, form=form, students=students)
+    return render_template('admin/schedule_day.html', date=dt, lessons=lessons, form=form, students=students, teachers=teachers)
 
 
 @admin_bp.route('/schedule/<string:lesson_date>/edit/<int:lesson_id>', methods=['POST'])
@@ -133,11 +136,14 @@ def edit_lesson(lesson_date, lesson_id):
         return redirect(url_for('admin.schedule_day', lesson_date=lesson_date))
 
     students = User.query.filter_by(role='student').all()
+    teachers = User.query.filter_by(role='teacher').all()
     form = ScheduleLessonForm()
     form.student.choices = [(s.id, f'{s.first_name} {s.last_name}') for s in students]
+    form.teacher.choices = [(t.id, f'{t.first_name} {t.last_name}') for t in teachers]
 
     if form.validate_on_submit():
         lesson.student_id = form.student.data
+        lesson.teacher_id = form.teacher.data
         lesson.title = form.title.data
         lesson.date = form.date.data
         lesson.start_time = form.start_time.data
@@ -158,6 +164,7 @@ def api_lesson(lesson_id):
         return jsonify({'error': 'not found'}), 404
     return jsonify({
         'student_id': lesson.student_id,
+        'teacher_id': lesson.teacher_id,
         'title': lesson.title,
         'date': lesson.date.isoformat(),
         'start_time': lesson.start_time.strftime('%H:%M'),

@@ -33,6 +33,7 @@ class LoginForm(FlaskForm):
 
 class ScheduleLessonForm(FlaskForm):
     student = SelectField('Ученик', coerce=int, validators=[DataRequired()])
+    teacher = SelectField('Учитель', coerce=int, validators=[DataRequired()])
     title = StringField('Название занятия', validators=[DataRequired()])
     date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
     start_time = TimeField('Начало', format='%H:%M', validators=[DataRequired()])

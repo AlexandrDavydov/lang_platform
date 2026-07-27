@@ -33,13 +33,15 @@ class User(UserMixin, db.Model):
 class ScheduleLesson(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
     date = db.Column(db.Date, nullable=False, index=True)
     start_time = db.Column(db.Time, nullable=False)
     end_time = db.Column(db.Time, nullable=False)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    student = db.relationship('User', backref='lessons')
+    student = db.relationship('User', backref='lessons', foreign_keys=[student_id])
+    teacher = db.relationship('User', backref='taught_lessons', foreign_keys=[teacher_id])
 
     def __repr__(self):
         return f'<Lesson {self.title} {self.date} {self.start_time}-{self.end_time}>'

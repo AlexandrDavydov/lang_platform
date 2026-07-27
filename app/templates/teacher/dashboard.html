@@ -5,5 +5,52 @@
 {% block content %}
 <h1>Кабинет учителя</h1>
 <p>Добро пожаловать, {{ current_user.first_name }} {{ current_user.last_name }}!</p>
-<p>Это заглушка дашборда учителя.</p>
+
+<h2>Предстоящие занятия</h2>
+{% if upcoming %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Дата</th>
+        <th>Ученик</th>
+        <th>Название</th>
+        <th>Начало</th>
+        <th>Конец</th>
+    </tr>
+    {% for lesson in upcoming %}
+    <tr>
+        <td>{{ lesson.date.strftime('%d.%m.%Y') }}</td>
+        <td>{{ lesson.student.first_name }} {{ lesson.student.last_name }}</td>
+        <td>{{ lesson.title }}</td>
+        <td>{{ lesson.start_time.strftime('%H:%M') }}</td>
+        <td>{{ lesson.end_time.strftime('%H:%M') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Нет предстоящих занятий.</p>
+{% endif %}
+
+<h2>Прошедшие занятия</h2>
+{% if past %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Дата</th>
+        <th>Ученик</th>
+        <th>Название</th>
+        <th>Начало</th>
+        <th>Конец</th>
+    </tr>
+    {% for lesson in past %}
+    <tr>
+        <td>{{ lesson.date.strftime('%d.%m.%Y') }}</td>
+        <td>{{ lesson.student.first_name }} {{ lesson.student.last_name }}</td>
+        <td>{{ lesson.title }}</td>
+        <td>{{ lesson.start_time.strftime('%H:%M') }}</td>
+        <td>{{ lesson.end_time.strftime('%H:%M') }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>Нет прошедших занятий.</p>
+{% endif %}
 {% endblock %}

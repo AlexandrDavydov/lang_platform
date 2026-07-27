@@ -51,10 +51,17 @@ with app.app_context():
     db.session.add(admin)
     db.session.add_all(teachers)
     db.session.add_all(students)
+
     db.session.commit()
 
-    print('База заполнена:')
-    print(f'  Админ:     admin@lang.ru / admin123')
-    print(f'  Учителя:   teacher1@lang.ru / teacher123')
-    print(f'             teacher2@lang.ru / teacher123')
-    print(f'  Ученики:   student1-10@lang.ru / student123')
+    print()
+    print('=' * 60)
+    print('  Role     | Email                  | Password')
+    print('=' * 60)
+    print('  admin    | admin@lang.ru          | admin123')
+    print('  teacher  | teacher1@lang.ru       | teacher123')
+    print('  teacher  | teacher2@lang.ru       | teacher123')
+    for i in range(1, 11):
+        print(f'  student  | student{i}@lang.ru        | student123')
+    print('=' * 60)
+    print()

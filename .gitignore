@@ -10,3 +10,4 @@ venv/
 dist/
 build/
 .idea/
+.pytest_cache/

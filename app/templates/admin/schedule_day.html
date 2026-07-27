@@ -10,6 +10,7 @@
 <table border="1" cellpadding="8">
     <tr>
         <th>Ученик</th>
+        <th>Учитель</th>
         <th>Название</th>
         <th>Начало</th>
         <th>Конец</th>
@@ -18,6 +19,7 @@
     {% for lesson in lessons %}
     <tr>
         <td>{{ lesson.student.first_name }} {{ lesson.student.last_name }}</td>
+        <td>{{ lesson.teacher.first_name }} {{ lesson.teacher.last_name }}</td>
         <td>{{ lesson.title }}</td>
         <td>{{ lesson.start_time.strftime('%H:%M') }}</td>
         <td>{{ lesson.end_time.strftime('%H:%M') }}</td>
@@ -42,6 +44,10 @@
     <p>
         {{ form.student.label }}<br>
         {{ form.student() }}
+    </p>
+    <p>
+        {{ form.teacher.label }}<br>
+        {{ form.teacher() }}
     </p>
     <p>
         {{ form.title.label }}<br>
@@ -70,6 +76,7 @@ function editLesson(id) {
         .then(r => r.json())
         .then(data => {
             document.querySelector('#student').value = data.student_id;
+            document.querySelector('#teacher').value = data.teacher_id;
             document.querySelector('#title').value = data.title;
             document.querySelector('#date').value = data.date;
             document.querySelector('#start_time').value = data.start_time;
