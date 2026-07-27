@@ -83,3 +83,53 @@ def test_teacher_creates_lesson_student_admin_see_it(page, live_server):
     page.wait_for_selector('table')
 
     assert page.locator('table tbody').filter(has_text='Teacher Created Lesson').is_visible()
+
+
+def test_time_conflict_validation(page, live_server):
+    base_url = live_server
+    conflict_date = (date.today() + timedelta(days=32)).isoformat()
+
+    login(page, base_url, 'admin@lang.ru', 'admin123')
+    page.wait_for_url(f'{base_url}/admin/dashboard')
+
+    # 1. Create initial lesson: Teacher #1 + Student #1 at 10:00-11:00
+    page.goto(f'{base_url}/admin/schedule/{conflict_date}')
+    page.wait_for_selector('#student')
+    page.select_option('#student', label='Student #1')
+    page.select_option('#teacher', label='Teacher #1')
+    page.fill('#title', 'Initial Lesson')
+    page.fill('#start_time', '10:00')
+    page.fill('#end_time', '11:00')
+    page.click('input[type="submit"]')
+    page.wait_for_selector('table')
+    assert page.locator('table tbody').filter(has_text='Initial Lesson').is_visible()
+
+    # 2. Try to create overlapping lesson for same Teacher #1 at 10:30-11:30
+    page.select_option('#student', label='Student #2')
+    page.select_option('#teacher', label='Teacher #1')
+    page.fill('#title', 'Teacher Overlap')
+    page.fill('#start_time', '10:30')
+    page.fill('#end_time', '11:30')
+    page.click('input[type="submit"]')
+    page.wait_for_selector('.flash')
+    assert page.locator('.flash').filter(has_text='Учитель уже занят').is_visible()
+
+    # 3. Try to create overlapping lesson for same Student #1 at 10:30-11:30 with Teacher #2
+    page.select_option('#student', label='Student #1')
+    page.select_option('#teacher', label='Teacher #2')
+    page.fill('#title', 'Student Overlap')
+    page.fill('#start_time', '10:30')
+    page.fill('#end_time', '11:30')
+    page.click('input[type="submit"]')
+    page.wait_for_selector('.flash')
+    assert page.locator('.flash').filter(has_text='Ученик уже занят').is_visible()
+
+    # 4. Create non-overlapping lesson at 12:00-13:00 with same Teacher #1 + Student #1
+    page.select_option('#student', label='Student #1')
+    page.select_option('#teacher', label='Teacher #1')
+    page.fill('#title', 'Non Overlapping')
+    page.fill('#start_time', '12:00')
+    page.fill('#end_time', '13:00')
+    page.click('input[type="submit"]')
+    page.wait_for_selector('table')
+    assert page.locator('table tbody').filter(has_text='Non Overlapping').is_visible()
