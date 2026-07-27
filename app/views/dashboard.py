@@ -101,17 +101,22 @@ def teacher_schedule_day(lesson_date):
     form.date.data = dt
 
     if form.validate_on_submit():
-        lesson = ScheduleLesson(
-            student_id=form.student.data,
-            teacher_id=current_user.id,
-            title=form.title.data,
-            date=form.date.data,
-            start_time=form.start_time.data,
-            end_time=form.end_time.data,
-        )
-        db.session.add(lesson)
-        db.session.commit()
-        flash('Занятие добавлено.')
+        if ScheduleLesson.has_conflict(current_user.id, form.date.data, form.start_time.data, form.end_time.data):
+            flash('Вы уже заняты в это время.')
+        elif ScheduleLesson.has_conflict(form.student.data, form.date.data, form.start_time.data, form.end_time.data):
+            flash('Ученик уже занят в это время.')
+        else:
+            lesson = ScheduleLesson(
+                student_id=form.student.data,
+                teacher_id=current_user.id,
+                title=form.title.data,
+                date=form.date.data,
+                start_time=form.start_time.data,
+                end_time=form.end_time.data,
+            )
+            db.session.add(lesson)
+            db.session.commit()
+            flash('Занятие добавлено.')
         return redirect(url_for('dashboard.teacher_schedule_day', lesson_date=lesson_date))
 
     lessons = ScheduleLesson.query.filter_by(
@@ -136,13 +141,18 @@ def teacher_edit_lesson(lesson_date, lesson_id):
     form.student.choices = [(s.id, f'{s.first_name} {s.last_name}') for s in students]
 
     if form.validate_on_submit():
-        lesson.student_id = form.student.data
-        lesson.title = form.title.data
-        lesson.date = form.date.data
-        lesson.start_time = form.start_time.data
-        lesson.end_time = form.end_time.data
-        db.session.commit()
-        flash('Занятие обновлено.')
+        if ScheduleLesson.has_conflict(current_user.id, form.date.data, form.start_time.data, form.end_time.data, exclude_id=lesson.id):
+            flash('Вы уже заняты в это время.')
+        elif ScheduleLesson.has_conflict(form.student.data, form.date.data, form.start_time.data, form.end_time.data, exclude_id=lesson.id):
+            flash('Ученик уже занят в это время.')
+        else:
+            lesson.student_id = form.student.data
+            lesson.title = form.title.data
+            lesson.date = form.date.data
+            lesson.start_time = form.start_time.data
+            lesson.end_time = form.end_time.data
+            db.session.commit()
+            flash('Занятие обновлено.')
         return redirect(url_for('dashboard.teacher_schedule_day', lesson_date=lesson.date.isoformat()))
 
     return redirect(url_for('dashboard.teacher_schedule_day', lesson_date=lesson_date))

@@ -43,6 +43,18 @@ class ScheduleLesson(db.Model):
     student = db.relationship('User', backref='lessons', foreign_keys=[student_id])
     teacher = db.relationship('User', backref='taught_lessons', foreign_keys=[teacher_id])
 
+    @staticmethod
+    def has_conflict(user_id, date, start_time, end_time, exclude_id=None):
+        query = ScheduleLesson.query.filter(
+            ScheduleLesson.date == date,
+            ScheduleLesson.start_time < end_time,
+            ScheduleLesson.end_time > start_time,
+            (ScheduleLesson.teacher_id == user_id) | (ScheduleLesson.student_id == user_id),
+        )
+        if exclude_id:
+            query = query.filter(ScheduleLesson.id != exclude_id)
+        return query.first() is not None
+
     def __repr__(self):
         return f'<Lesson {self.title} {self.date} {self.start_time}-{self.end_time}>'
 
