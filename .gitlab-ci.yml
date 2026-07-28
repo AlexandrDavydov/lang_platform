@@ -1,0 +1,18 @@
+image: mcr.microsoft.com/playwright/python:v1.61.0
+
+before_script:
+  - pip install -r requirements.txt
+  - pip install pytest-playwright
+  - playwright install chromium
+
+stages:
+  - test
+
+tests:
+  stage: test
+  script:
+    - pytest tests/ -v --headed=false --junitxml=report.xml
+  artifacts:
+    when: always
+    reports:
+      junit: report.xml
