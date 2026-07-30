@@ -6,6 +6,28 @@
 <h1>Кабинет ученика</h1>
 <p>Добро пожаловать, {{ current_user.first_name }} {{ current_user.last_name }}!</p>
 
+<h2>Мои уроки</h2>
+{% if assigned_lessons %}
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Материалов</th>
+        <th></th>
+    </tr>
+    {% for lesson in assigned_lessons %}
+    <tr>
+        <td>{{ lesson.title }}</td>
+        <td>{{ lesson.description[:100] if lesson.description else '' }}</td>
+        <td>{{ lesson.materials.count() }}</td>
+        <td><a href="{{ url_for('materials.lesson_detail', id=lesson.id) }}">Открыть</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>У вас пока нет назначенных уроков.</p>
+{% endif %}
+
 <h2>Предстоящие занятия</h2>
 {% if upcoming %}
 <table border="1" cellpadding="8">

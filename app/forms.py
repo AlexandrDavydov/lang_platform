@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, SelectField, DateField, TimeField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, SubmitField, SelectField, SelectMultipleField, DateField, TimeField, TextAreaField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Optional
 from app.models import User
 
 
@@ -47,4 +47,24 @@ class TeacherLessonForm(FlaskForm):
     date = DateField('Дата', format='%Y-%m-%d', validators=[DataRequired()])
     start_time = TimeField('Начало', format='%H:%M', validators=[DataRequired()])
     end_time = TimeField('Конец', format='%H:%M', validators=[DataRequired()])
+    submit = SubmitField('Сохранить')
+
+
+class LessonForm(FlaskForm):
+    title = StringField('Название урока', validators=[DataRequired()])
+    description = TextAreaField('Описание', validators=[Optional()])
+    students = SelectMultipleField('Ученики', coerce=int, validators=[Optional()])
+    materials = SelectMultipleField('Материалы', coerce=int, validators=[Optional()])
+    submit = SubmitField('Сохранить')
+
+
+class MaterialForm(FlaskForm):
+    title = StringField('Название материала', validators=[DataRequired()])
+    content = TextAreaField('Содержание', validators=[Optional()])
+    material_type = SelectField('Тип', choices=[
+        ('text', 'Текст'),
+        ('link', 'Ссылка'),
+        ('image', 'Изображение'),
+    ])
+    file_url = StringField('URL / Ссылка', validators=[Optional()])
     submit = SubmitField('Сохранить')

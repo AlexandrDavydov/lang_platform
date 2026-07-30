@@ -1,6 +1,4 @@
 from datetime import date, timedelta
-import pytest
-
 
 FUTURE = (date.today() + timedelta(days=30)).isoformat()
 

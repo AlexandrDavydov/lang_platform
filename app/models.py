@@ -4,6 +4,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login_manager
 
 
+lesson_materials = db.Table('lesson_materials',
+    db.Column('lesson_id', db.Integer, db.ForeignKey('lesson.id'), primary_key=True),
+    db.Column('material_id', db.Integer, db.ForeignKey('material.id'), primary_key=True),
+    db.Column('order', db.Integer, default=0),
+)
+
+lesson_students = db.Table('lesson_students',
+    db.Column('lesson_id', db.Integer, db.ForeignKey('lesson.id'), primary_key=True),
+    db.Column('student_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+)
+
+
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
@@ -57,6 +69,39 @@ class ScheduleLesson(db.Model):
 
     def __repr__(self):
         return f'<Lesson {self.title} {self.date} {self.start_time}-{self.end_time}>'
+
+
+class Lesson(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.Text)
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    created_by = db.relationship('User', backref='created_lessons', foreign_keys=[created_by_id])
+    students = db.relationship('User', secondary=lesson_students, lazy='dynamic',
+                               backref=db.backref('study_lessons', lazy='dynamic'))
+    materials = db.relationship('Material', secondary=lesson_materials, lazy='dynamic',
+                                order_by=lesson_materials.c.order,
+                                backref=db.backref('lessons', lazy='dynamic'))
+
+    def __repr__(self):
+        return f'<Lesson {self.title}>'
+
+
+class Material(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text)
+    material_type = db.Column(db.String(20), default='text')
+    file_url = db.Column(db.String(500))
+    created_by_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+
+    created_by = db.relationship('User', backref='created_materials')
+
+    def __repr__(self):
+        return f'<Material {self.title}>'
 
 
 @login_manager.user_loader

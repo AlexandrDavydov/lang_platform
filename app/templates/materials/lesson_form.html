@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Редактировать' if lesson else 'Создать' }} урок{% endblock %}
+
+{% block content %}
+<h1>{{ 'Редактировать' if lesson else 'Создать' }} урок</h1>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=64) }}
+    </p>
+    <p>
+        {{ form.description.label }}<br>
+        {{ form.description(rows=5, cols=60) }}
+    </p>
+    <p>
+        {{ form.students.label }}
+    </p>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th></th>
+            <th>Ученик</th>
+        </tr>
+        {% for value, label, checked, _ in form.students.iter_choices() %}
+        <tr>
+            <td><input type="checkbox" name="{{ form.students.name }}" value="{{ value }}" {% if checked %}checked{% endif %}></td>
+            <td>{{ label }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>
+        {{ form.materials.label }}
+    </p>
+    <table border="1" cellpadding="6">
+        <tr>
+            <th></th>
+            <th>Название</th>
+            <th>Порядок</th>
+        </tr>
+        {% for value, label, checked, _ in form.materials.iter_choices() %}
+        <tr>
+            <td><input type="checkbox" name="{{ form.materials.name }}" value="{{ value }}" {% if checked %}checked{% endif %}></td>
+            <td>{{ label }}</td>
+            <td><input type="number" name="order_{{ value }}" value="{{ material_orders.get(value|int, 0) }}" min="0" max="99" style="width:50px"></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>{{ form.submit() }}</p>
+</form>
+
+<a href="{{ url_for('materials.lesson_list') }}">&larr; Назад к урокам</a>
+{% endblock %}

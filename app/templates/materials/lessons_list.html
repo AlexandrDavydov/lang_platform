@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Уроки{% endblock %}
+
+{% block content %}
+<h1>Уроки</h1>
+
+{% if current_user.role != 'student' %}
+    <a href="{{ url_for('materials.lesson_create') }}" class="btn">Создать урок</a>
+    <a href="{{ url_for('materials.material_list') }}" class="btn">Материалы</a>
+{% endif %}
+
+<table border="1" cellpadding="8">
+    <tr>
+        <th>Название</th>
+        <th>Описание</th>
+        <th>Материалов</th>
+        <th>Ученик</th>
+        <th>Автор</th>
+        <th>Действия</th>
+    </tr>
+    {% for lesson in lessons %}
+    <tr>
+        <td>{{ lesson.title }}</td>
+        <td>{{ lesson.description[:100] if lesson.description else '' }}</td>
+        <td>{{ lesson.materials.count() }}</td>
+        <td>{% if lesson.students.count() %}{% for s in lesson.students %}{{ s.first_name }} {{ s.last_name }}{% if not loop.last %}, {% endif %}{% endfor %}{% else %}—{% endif %}</td>
+        <td>{{ lesson.created_by.first_name }} {{ lesson.created_by.last_name }}</td>
+        <td>
+            <a href="{{ url_for('materials.lesson_detail', id=lesson.id) }}">Просмотр</a>
+            {% if current_user.role != 'student' %}
+                <a href="{{ url_for('materials.lesson_edit', id=lesson.id) }}">Редактировать</a>
+                <form method="POST" action="{{ url_for('materials.lesson_delete', id=lesson.id) }}" style="display:inline">
+                    <button type="submit" onclick="return confirm('Удалить урок?')">Удалить</button>
+                </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="6">Нет уроков.</td></tr>
+    {% endfor %}
+</table>
+{% endblock %}

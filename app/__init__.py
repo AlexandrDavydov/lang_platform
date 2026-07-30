@@ -21,10 +21,12 @@ def create_app(config_class=Config):
     from app.views.auth import auth_bp
     from app.views.admin import admin_bp
     from app.views.dashboard import dashboard_bp
+    from app.views.materials import materials_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(dashboard_bp)
+    app.register_blueprint(materials_bp)
 
     with app.app_context():
         db.create_all()

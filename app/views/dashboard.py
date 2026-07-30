@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from app import db
 from app.decorators import role_required
-from app.models import User, ScheduleLesson
+from app.models import User, ScheduleLesson, Lesson
 from app.forms import TeacherLessonForm
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard')
@@ -25,7 +25,9 @@ def student():
         ScheduleLesson.date < today,
     ).order_by(ScheduleLesson.date.desc(), ScheduleLesson.start_time).all()
 
-    return render_template('student/dashboard.html', upcoming=upcoming, past=past)
+    assigned_lessons = Lesson.query.filter(Lesson.students.any(id=current_user.id)).order_by(Lesson.created_at.desc()).all()
+
+    return render_template('student/dashboard.html', upcoming=upcoming, past=past, assigned_lessons=assigned_lessons)
 
 
 @dashboard_bp.route('/teacher')

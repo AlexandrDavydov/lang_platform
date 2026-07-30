@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}{{ 'Редактировать' if material else 'Создать' }} материал{% endblock %}
+
+{% block content %}
+<h1>{{ 'Редактировать' if material else 'Создать' }} материал</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <p>
+        {{ form.title.label }}<br>
+        {{ form.title(size=64) }}
+    </p>
+    <p>
+        {{ form.material_type.label }}<br>
+        {{ form.material_type(onchange="toggleFields()") }}
+    </p>
+    <p id="url-field">
+        {{ form.file_url.label }}<br>
+        {{ form.file_url(size=64) }}
+    </p>
+    <p id="image-field">
+        <label>Файл изображения</label><br>
+        <input type="file" name="image_file" accept="image/*" onchange="previewImage(event)">
+        <br>
+        <img id="image-preview" src="{% if material and material.material_type == 'image' and material.file_url %}{{ url_for('static', filename='uploads/' + material.file_url) }}{% endif %}" style="max-width:200px;max-height:150px;{% if not (material and material.material_type == 'image' and material.file_url) %}display:none{% endif %}">
+    </p>
+    <p id="content-field">
+        {{ form.content.label }}<br>
+        {{ form.content(rows=10, cols=60) }}
+    </p>
+    {% if lesson_id %}
+        <input type="hidden" name="lesson_id" value="{{ lesson_id }}">
+    {% endif %}
+    <p>{{ form.submit() }}</p>
+</form>
+
+<a href="{{ url_for('materials.material_list') }}">&larr; Назад к материалам</a>
+
+<script>
+function previewImage(event) {
+    var preview = document.getElementById('image-preview');
+    var file = event.target.files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function toggleFields() {
+    var type = document.querySelector('#material_type').value;
+    document.querySelector('#url-field').style.display = type === 'link' ? 'block' : 'none';
+    document.querySelector('#image-field').style.display = type === 'image' ? 'block' : 'none';
+    document.querySelector('#content-field').style.display = type === 'text' ? 'block' : 'none';
+
+    var preview = document.getElementById('image-preview');
+    if (type === 'image' && !preview.src) {
+        preview.style.display = 'none';
+    }
+}
+toggleFields();
+</script>
+{% endblock %}

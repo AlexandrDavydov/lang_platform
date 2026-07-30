@@ -15,3 +15,6 @@ class Config:
     MAIL_USERNAME = 'cconformationnoreply@gmail.com'
     MAIL_PASSWORD = 'muza vlnp xmcc qtsi'
     MAIL_DEFAULT_SENDER = 'cconformationnoreply@gmail.com'
+
+    UPLOAD_FOLDER = os.path.join(basedir, 'app', 'static', 'uploads')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
